@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -12,10 +12,9 @@ const { ethereum } = window;
 
 
 
-
+    //Contract
 const signer=()=>{
   const provider = new ethers.providers.Web3Provider(window.ethereum)
-    //Setsigner
   const signer = provider.getSigner()
   const token = new ethers.Contract(tokenAddress.address, tokenAbi.abi, signer)
   return token;
@@ -23,13 +22,21 @@ const signer=()=>{
   
 
 const Staking = ({walletAddress,item,idx}) => {
-    
-  const BuyToken= async()=>{
-  console.log(signer())
-  let id = await item.tokenId.toString();  
-  console.log(id,item.tokens)
-  await signer().BuyToken(item.tokenId,item.tokens,{value:item.price})
-    alert("Successfully Buy");
+  const [loading, setloading] = useState(false);
+      
+const BuyToken= async()=>{
+  try {
+    setloading(true);
+    let id = await item.tokenId.toString();  
+    await signer().BuyToken(item.tokenId,item.tokens,{value:item.price})
+      alert("Successfully Buy");
+      setloading(false);
+      window.location.reload();
+  } catch (error) {
+    console.log(error)
+    setloading(false);
+  }
+  
 }
 
 
@@ -55,13 +62,12 @@ return (
           {'"This is MrS Token"'}
         </Typography>
       </CardContent>
-     <button onClick={BuyToken} className="button is-link ">
+     <button onClick={BuyToken} className="button is-link"disabled={loading} >
                   Buy Tokens
       </button>
   </Card>
 :""}
-    
-    </div>
+</div>
   )
 }
 

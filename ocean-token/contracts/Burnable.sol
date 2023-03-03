@@ -140,7 +140,7 @@ contract BrnToken is ERC20,Ownable {
         transfer(address(this),_tokens);   
         stakingId++;
         uint256 temp=(stakingTime+block.timestamp);
-        staking[stakingId]=stake(stakingId,msg.sender,_tokens,temp,block.timestamp);
+        staking[stakingId]=stake(stakingId,msg.sender,_tokens,block.timestamp,temp);
     }
 
     function WithdrawStakingTokens(uint256 stakingId) public {

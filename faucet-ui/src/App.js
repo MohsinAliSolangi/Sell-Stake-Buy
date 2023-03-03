@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
 import faucetContract from "./ethereum/BrnToken.json";
 import MintToken from './componant/MintToken'
 
 
 function App() {
   const [walletAddress, setWalletAddress] = useState("");
+  const [balance, setBalance]= useState("")
   const [signer, setSigner] = useState();
   const [fcContract, setFcContract] = useState();
   const [withdrawError, setWithdrawError] = useState("");
@@ -48,6 +49,14 @@ function App() {
         /* get accounts */
         const accounts = await provider.send("eth_accounts", []);
         if (accounts.length > 0) {
+          const balance = await provider.getBalance(accounts[0]);
+          
+          let bal = utils.formatEther(balance)
+          setBalance(bal);
+          
+          
+          console.log("balance",bal)
+            
           // /* get signer */
           // setSigner(provider.getSigner());
           // /* local contract instance */
@@ -78,23 +87,16 @@ function App() {
     }
   };
 
-  console.log("fcContract",walletAddress)
-
   return (
     <div>
       <nav className="navbar">
         <div className="container">
-          <div>BALANCE OF THE USER </div>
-          <div style={{marginLeft:"20px"}} >{fcContract}BALANCE OF THE STAKE USER </div>
-          <div style={{marginLeft:"20px"}} >BALANCE OF THE ETH </div>
-          
-
-        
-           <div 
+         <div>{balance} ETH</div>
+        <div 
             className="navbar-end is-align-items-center"
             >
               <button
-               m  className="button is-white connect-wallet"
+             className="button is-white connect-wallet"
                 onClick={connectWallet}
               >
                 <span className="is-link has-text-weight-bold">

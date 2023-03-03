@@ -1,5 +1,5 @@
 body {
-  background: url("./images/bg-1.png") no-repeat;
+  background: url("./images/bg-1.jpg") no-repeat;
   background-color: #070709;
   color: white;
 }
@@ -47,9 +47,6 @@ body {
 .connect-wallet:hover {
   background-color: #e1e1e1 !important;
 }
-
-
-
 
 
 .faucet-hero-body {

@@ -20,62 +20,102 @@ const signer = () => {
 
 
 const MintToken = ({ walletAddress }) => {
-
+ const [loading, setloading] = useState(false);
   const [market, setMarket] = useState([]);
   const [amount, setAmount] = useState(null);
   //const [Amount, setAmount] = useState({value:"",amount:""});
   const [price, setPrice] = useState(null);
   const [stakeAmount, setStakeAmount] = useState([]);
 
-  const ListedTokens = async () => {
-    let list = await signer().ListedTokens();
-    let items = []
-    let lgth = list.length;
-    for (let i = 0; i < lgth; i++) {
-      if (list[i].price > 0) {
-        items.push(list[i])
-      }
-    }
-    setMarket(items);
 
+
+  const ListedTokens = async () => {
+  try {
+      let list = await signer().ListedTokens();
+      let items = []
+      let lgth = list.length;
+      for (let i = 0; i < lgth; i++) {
+        if (list[i].price > 0) {
+          items.push(list[i])
+        }
+      }
+      setMarket(items);
+    } catch (error) {
+  console.log(error) 
   }
+}
+
+
+
+  
 
 
 
   const mints = async () => {
-    await signer().mint(walletAddress, amount, { value: amount });
-    setAmount("")
-    setPrice("")
-    alert("successfully Minted");
+    try {
+      setloading(true);
+      await signer().mint(walletAddress, amount, { value: amount });
+      setAmount("")
+      setPrice("")
+      alert("successfully Minted");
+      setloading(false);
+      window.location.reload();
+    } catch (error) {
+      console.log(error)
+      setloading(false);
+    }
+  
   }
 
 
 
   const SellTokens = async () => {
+  
+    try {
+      setloading(true);
     await signer().SellTokens(amount, price);
     setAmount("")
     setPrice("")
     alert("successfully lsited");
+    setloading(false);
+    window.location.reload();
+    } catch (error) {
+      console.log(error) 
+      setloading(false);
+    }
+    
   }
+
   const tokenStaking = async () => {
-    await signer().tokenStaking(amount);
-    setAmount("");
+    try {
+      setloading(true);
+      await signer().tokenStaking(amount);
+      setAmount("");
+      setloading(false);
+      window.location.reload();
+    } catch (error) {
+      console.log(error) 
+      setloading(false);
+    }
+  
   }
 
   const Stakings = async () => {
-
-    let temp = await signer().stakingId();
+    try {
+      let temp = await signer().stakingId();
     let items = []
     for (let i = 0; i <= temp; i++) {
       let stake = await signer().staking(i);
       if (stake.staker.toString().toLowerCase() === walletAddress.toString().toLowerCase()) {
-        items.push(stake[i])
+        let stakes = await signer().staking(i);
+        items.push(stakes)
       }
     }
-    console.log(items)
-    setStakeAmount(items)
+    setStakeAmount(items) 
+    } catch (error) {
+      console.log(error) 
+    }
   }
-
 
   useEffect(() => {
     ListedTokens()
@@ -90,7 +130,6 @@ const MintToken = ({ walletAddress }) => {
     }
   }, [stakeAmount])
 
-
   return (
     <div>
       <div className="faucet-hero-body">
@@ -103,12 +142,13 @@ const MintToken = ({ walletAddress }) => {
                 <input
                   className="input is-medium"
                   type="number"
+                  required
                   placeholder="Enter Amount"
                   onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
               <div className="column">
-                <button onClick={mints} className="button is-link">
+                <button onClick={mints} className="button is-link" disabled={loading}>
                   Mint
                 </button>
               </div>
@@ -121,26 +161,26 @@ const MintToken = ({ walletAddress }) => {
         <div className="container main-content" >
           <div className="box address-box">
             <h1 className="title">Staking Tokens </h1>
+            <p>Staking Time 24Hr</p>
             <div className="columns">
               <div className="column is-four-fifths">
                 <input
                   className="input is-medium"
                   type="number"
+                  required
                   placeholder="Enter Tokens"
                   onChange={(e) => setAmount(e.target.value)}
 
                 />
               </div>
               <div className="column">
-                <button onClick={tokenStaking} className="button is-link">
+                <button onClick={tokenStaking} className="button is-link" disabled={loading}>
                   Staking
                 </button>
               </div>
             </div>
           </div>
         </div>
-
-
 
 
         {/* ////////////Listing//////////////////// */}
@@ -152,6 +192,7 @@ const MintToken = ({ walletAddress }) => {
                 <input
                   className="input is-medium"
                   type="number"
+                  required
                   placeholder="Enter Tokens"
                   onChange={(e) => setAmount(e.target.value)}
                 />
@@ -159,13 +200,14 @@ const MintToken = ({ walletAddress }) => {
                   <input
                     className="input is-medium"
                     type="number"
+                    required
                     placeholder="Enter Price"
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>
               </div>
               <div style={{ marginTop: "30px" }} className="column">
-                <button className="button is-link" onClick={SellTokens}>
+                <button className="button is-link" onClick={SellTokens} disabled={loading}>
                   Listing
                 </button>
               </div>
@@ -190,9 +232,6 @@ const MintToken = ({ walletAddress }) => {
               <div className="column">
               </div>
             </div>
-            <button className="button is-link ">
-              WithDraw Tokens
-            </button>
           </div>
         </div>
       </div>
@@ -201,16 +240,18 @@ const MintToken = ({ walletAddress }) => {
 
 
 
-      <div>
+      <div style={{marginTop:"20px"}}>
 
         {market.length > 0 ?
 
           <div className="row">
             {market.map((item, idx) => (
-
               <div className='col'>
+              <div className='col'>
+
                 <Staking walletAddress={walletAddress} item={item} idx={idx} />
-              </div>
+                </div>
+                </div>
             ))}
           </div>
           : (
